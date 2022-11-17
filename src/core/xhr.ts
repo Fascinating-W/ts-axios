@@ -2,12 +2,12 @@
  * @Author: Wanko
  * @Date: 2022-11-16 17:06:47
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 17:03:07
+ * @LastEditTime: 2022-11-17 17:49:50
  * @Description: 实现请求逻辑
  */
-import { createError } from './helpers/error'
-import { parseHeaders } from './helpers/headers'
-import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from './types/index'
+import { createError } from '../helpers/error'
+import { parseHeaders } from '../helpers/headers'
+import { AxiosRequestConfig, AxiosPromise, AxiosResponse } from '../types/index'
 
 export default function xhr(config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
@@ -22,8 +22,8 @@ export default function xhr(config: AxiosRequestConfig): AxiosPromise {
     if (timeout) {
       request.timeout = timeout
     }
-
-    request.open(method.toUpperCase(), url, true)
+    // url! 类型断言 url一定会存在（不为空）
+    request.open(method.toUpperCase(), url!, true)
 
     request.onreadystatechange = function handleLoad() {
       // 只有4才代表请求正常

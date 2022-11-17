@@ -2,7 +2,7 @@
  * @Author: Wanko
  * @Date: 2022-11-16 16:45:29
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 17:26:14
+ * @LastEditTime: 2022-11-17 19:09:05
  * @Description: 公共类型定义文件
  */
 
@@ -86,4 +86,6 @@ export interface Axios {
  */
 export interface AxiosInstance extends Axios {
   (config: AxiosRequestConfig): AxiosPromise
+  // 添加一种函数类型定义
+  (url: string, config?: AxiosRequestConfig): AxiosPromise
 }

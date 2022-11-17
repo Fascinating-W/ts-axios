@@ -2,7 +2,7 @@
  * @Author: Wanko
  * @Date: 2022-11-16 18:20:22
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 09:47:52
+ * @LastEditTime: 2022-11-17 18:42:19
  * @Description: 工具辅助方法
  */
 
@@ -29,4 +29,12 @@ export function isObject(val: any): val is Object {
  */
 export function isPlainObject(val: any): val is Object {
   return toString.call(val) === '[object Object]'
+}
+
+export function extent<T, U>(to: T, from: U): T & U {
+  for (let key in from) {
+    // 一般括号前加; (to as T&U) 强制类型断言
+    ;(to as T & U)[key] = from[key] as any
+  }
+  return to as T & U
 }

@@ -2,65 +2,29 @@
  * @Author: wanko
  * @Date: 2022-11-16 16:42:41
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 11:37:24
+ * @LastEditTime: 2022-11-17 18:56:53
  * @Description:
  */
 
-import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from './types/index'
-import xhr from './xhr'
-import { buildURL } from './helpers/url'
-import { transformRequest, transformResponse } from './helpers/data'
-import { processHeaders } from './helpers/headers'
-
-function axios(config: AxiosRequestConfig): AxiosPromise {
-  processConfig(config)
-  return xhr(config).then(res => {
-    return transformResponseData(res)
-  })
-}
-
+import Axios from './core/Axios'
+import { AxiosInstance } from './types'
+import { extent } from './helpers/util'
 /**
- * @description: 处理config
- * @param {AxiosRequestConfig} config
+ * @Description: 工厂函数创建axios实例,拥有request方法 和axios类中的原型和实例属性或方法
  * @return {*}
  */
-function processConfig(config: AxiosRequestConfig): void {
-  config.url = transformURL(config)
-  config.headers = tranformHeaders(config)
-  config.data = transformRequestData(config)
+function createInstance(): AxiosInstance {
+  const context = new Axios()
+  // instance函数 是 Axios原型上的request方法
+  const instance = Axios.prototype.request.bind(context)
+
+  // 把Axios上的原型属性和实例属性都拷贝到instance上
+
+  extent(instance, context)
+
+  return instance as AxiosInstance
 }
 
-/**
- * @Description: 处理url
- * @param {AxiosRequestConfig} config
- * @return {*}
- */
-function transformURL(config: AxiosRequestConfig): string {
-  const { url, params } = config
-  return buildURL(url, params)
-}
+const axios = createInstance()
 
-/**
- * @Description: 处理请求data
- * @param {AxiosRequestConfig} config
- * @return {*}
- */
-function transformRequestData(config: AxiosRequestConfig): any {
-  return transformRequest(config.data)
-}
-
-function tranformHeaders(config: AxiosRequestConfig): any {
-  const { headers = {}, data } = config
-  return processHeaders(headers, data)
-}
-
-/**
- * @Description: 处理response中的data数据
- * @param {AxiosResponse} res
- * @return {*}
- */
-function transformResponseData(res: AxiosResponse): AxiosResponse {
-  res.data = transformResponse(res.data)
-  return res
-}
 export default axios
