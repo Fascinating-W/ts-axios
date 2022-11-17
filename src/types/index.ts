@@ -2,7 +2,7 @@
  * @Author: Wanko
  * @Date: 2022-11-16 16:45:29
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 17:18:04
+ * @LastEditTime: 2022-11-17 17:26:14
  * @Description: 公共类型定义文件
  */
 
@@ -56,4 +56,34 @@ export interface AxiosError extends Error {
   request?: any
   response?: AxiosResponse
   isAxiosError: boolean
+}
+
+/**
+ * @Description: 用来描述Axios类中的公共方法
+ * @return {*}
+ */
+export interface Axios {
+  request(config: AxiosRequestConfig): AxiosPromise
+
+  get(url: string, config?: AxiosRequestConfig): AxiosPromise
+
+  delete(url: string, config?: AxiosRequestConfig): AxiosPromise
+
+  head(url: string, config?: AxiosRequestConfig): AxiosPromise
+
+  options(url: string, config?: AxiosRequestConfig): AxiosPromise
+
+  post(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+
+  put(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+
+  patch(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+}
+
+/**
+ * @Description: 混合类型接口，这个接口本身是一个函数，但是又继承了Axios的各种方法
+ * @return {*}
+ */
+export interface AxiosInstance extends Axios {
+  (config: AxiosRequestConfig): AxiosPromise
 }
