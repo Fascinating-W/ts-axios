@@ -1,3 +1,10 @@
+/*
+ * @Author: Wanko
+ * @Date: 2022-11-16 16:31:24
+ * @LastEditors: Wanko
+ * @LastEditTime: 2023-02-16 09:44:56
+ * @Description: 
+ */
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import sourceMaps from 'rollup-plugin-sourcemaps'
@@ -10,7 +17,8 @@ const pkg = require('./package.json')
 const libraryName = 'ts-axios'
 
 export default {
-  input: `src/${libraryName}.ts`,
+  // input: `src/${libraryName}.ts`,
+  input: `src/index.ts`,
   output: [
     { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
     { file: pkg.module, format: 'es', sourcemap: true },

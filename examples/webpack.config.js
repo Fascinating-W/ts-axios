@@ -2,6 +2,17 @@ const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 
+const entries = fs.readdirSync(__dirname).reduce((entries, dir) => {
+  const fullDir = path.join(__dirname, dir)
+  const entry = path.join(fullDir, 'app.ts')
+  if (fs.statSync(fullDir).isDirectory() && fs.existsSync(entry)) {
+    entries[dir] = ['webpack-hot-middleware/client', entry]
+  }
+
+  return entries
+}, {})
+
+console.log(entries)
 module.exports = {
   mode: 'development',
 
@@ -13,15 +24,9 @@ module.exports = {
    * entries 收集了多目录个入口文件，并且每个入口还引入了一个用于热更新的文件
    * entries 是一个对象，key 为目录名
    */
-  entry: fs.readdirSync(__dirname).reduce((entries, dir) => {
-    const fullDir = path.join(__dirname, dir)
-    const entry = path.join(fullDir, 'app.ts')
-    if (fs.statSync(fullDir).isDirectory() && fs.existsSync(entry)) {
-      entries[dir] = ['webpack-hot-middleware/client', entry]
-    }
 
-    return entries
-  }, {}),
+  
+  entry:entries,
 
   /**
    * 根据不同的目录名称，打包生成目标 js，名称和目录名一致

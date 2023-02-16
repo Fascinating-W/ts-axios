@@ -2,7 +2,7 @@
  * @Author: Wanko
  * @Date: 2022-11-16 18:20:22
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 18:42:19
+ * @LastEditTime: 2022-12-16 15:46:18
  * @Description: 工具辅助方法
  */
 
@@ -37,4 +37,40 @@ export function extent<T, U>(to: T, from: U): T & U {
     ;(to as T & U)[key] = from[key] as any
   }
   return to as T & U
+}
+
+/**
+ * @Description: 普通对象的深拷贝
+ * @param {array} objs  多个参数
+ * @return {*}
+ */
+export function deepMerge(...objs: any[]): any {
+  const result = Object.create(null)
+
+  objs.forEach(obj => {
+    if (obj) {
+      Object.keys(obj).forEach(key => {
+        const val = obj[key]
+        if (isPlainObject(val)) {
+          if (isPlainObject(result[key])) {
+            result[key] = deepMerge(result[key], val)
+          } else {
+            result[key] = deepMerge(val)
+          }
+        } else {
+          result[key] = val
+        }
+      })
+    }
+  })
+
+  return result
+}
+
+export function isFormData(val: any): boolean {
+  return typeof val !== 'undefined' && val instanceof FormData
+}
+
+export function isURLSearchParams(val: any): val is URLSearchParams {
+  return typeof val !== 'undefined' && val instanceof URLSearchParams
 }

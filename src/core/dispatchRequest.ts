@@ -2,17 +2,19 @@
  * @Author: Wanko
  * @Date: 2022-11-17 17:29:41
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 17:49:57
+ * @LastEditTime: 2022-12-16 16:44:33
  * @Description: 发送请求的核心模块
  */
 
 import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from '../types/index'
 import xhr from './xhr'
-import { buildURL } from '../helpers/url'
+import { buildURL, combineURL, isAbsoluteURL } from '../helpers/url'
 import { transformRequest, transformResponse } from '../helpers/data'
-import { processHeaders } from '../helpers/headers'
-
+import { flattenHeaders, processHeaders } from '../helpers/headers'
+import transform from './transform'
 export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromise {
+  //
+  throwIfCancellationRequested(config)
   processConfig(config)
   return xhr(config).then(res => {
     return transformResponseData(res)
@@ -26,8 +28,10 @@ export default function dispatchRequest(config: AxiosRequestConfig): AxiosPromis
  */
 function processConfig(config: AxiosRequestConfig): void {
   config.url = transformURL(config)
-  config.headers = tranformHeaders(config)
-  config.data = transformRequestData(config)
+  // config.headers = tranformHeaders(config)
+  // config.data = transformRequestData(config)
+  config.data = transform(config.data, config.headers, config.transformRequest)
+  config.headers = flattenHeaders(config.headers, config.method!)
 }
 
 /**
@@ -35,9 +39,12 @@ function processConfig(config: AxiosRequestConfig): void {
  * @param {AxiosRequestConfig} config
  * @return {*}
  */
-function transformURL(config: AxiosRequestConfig): string {
-  const { url, params } = config
-  return buildURL(url!, params)
+export function transformURL(config: AxiosRequestConfig): string {
+  let { url, params, paramsSerializer, baseURL } = config
+  if (baseURL && !isAbsoluteURL(url!)) {
+    url = combineURL(baseURL, url)
+  }
+  return buildURL(url!, params, paramsSerializer)
 }
 
 /**
@@ -60,6 +67,16 @@ function tranformHeaders(config: AxiosRequestConfig): any {
  * @return {*}
  */
 function transformResponseData(res: AxiosResponse): AxiosResponse {
-  res.data = transformResponse(res.data)
+  // res.data = transformResponse(res.data)
+  res.data = transform(res.data, res.headers, res.config.transformResponse)
   return res
+}
+
+/**
+ * @Description: 发送请求前检查一下配置的 cancelToken 是否已经使用过了，如果已经被用过则不用法请求，直接抛异常。
+ */
+function throwIfCancellationRequested(config: AxiosRequestConfig): void {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested()
+  }
 }

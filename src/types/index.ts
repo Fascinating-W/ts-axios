@@ -2,7 +2,7 @@
  * @Author: Wanko
  * @Date: 2022-11-16 16:45:29
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 19:09:05
+ * @LastEditTime: 2022-12-16 16:45:56
  * @Description: 公共类型定义文件
  */
 
@@ -31,11 +31,27 @@ export interface AxiosRequestConfig {
   // 响应的数据类型 "" | "arraybuffer" | "blob" | "document" | "json" | "text"
   responseType?: XMLHttpRequestResponseType
   timeout?: number
+  // transformRequest 是AxiosTransformer函数类型 或 AxiosTransformer函数类型数组
+  transformRequest?: AxiosTransformer | AxiosTransformer[]
+  transformResponse?: AxiosTransformer | AxiosTransformer[]
+  cancelToken?: CancelToken
+  withCredentials?: boolean
+
+  xsrfCookieName?: string
+  xsrfHeaderName?: string
+  onDownloadProgress?: (e: ProgressEvent) => void
+  onUploadProgress?: (e: ProgressEvent) => void
+  auth?: AxiosBasicCredentials
+  validateStatus?: (status: number) => boolean
+  paramsSerializer?: (params: any) => string
+  baseURL?: string
+  // 字符串的索引签名
+  [propName: string]: any
 }
 
 // 响应接口
-export interface AxiosResponse {
-  data: any
+export interface AxiosResponse<T = any> {
+  data: T
   status: number
   statusText: string
   headers: any
@@ -44,8 +60,8 @@ export interface AxiosResponse {
 }
 
 // axios 函数返回的是一个 Promise 对象，我们可以定义一个 AxiosPromise 接口，它继承于 Promise<AxiosResponse> 这个泛型接口
-export interface AxiosPromise extends Promise<AxiosResponse> {}
-
+// export interface AxiosPromise extends Promise<AxiosResponse> {}
+export interface AxiosPromise<T = any> extends Promise<AxiosResponse<T>> {}
 /**
  * @Description:  错误信息增强，返回更多的错误信息
  * @return {*}
@@ -63,29 +79,119 @@ export interface AxiosError extends Error {
  * @return {*}
  */
 export interface Axios {
-  request(config: AxiosRequestConfig): AxiosPromise
+  defaults: AxiosRequestConfig
+  interceptors: {
+    request: AxiosInterceptorManager<AxiosRequestConfig>
+    response: AxiosInterceptorManager<AxiosResponse>
+  }
+  request<T = any>(config: AxiosRequestConfig): AxiosPromise<T>
 
-  get(url: string, config?: AxiosRequestConfig): AxiosPromise
+  get<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  delete(url: string, config?: AxiosRequestConfig): AxiosPromise
+  delete<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  head(url: string, config?: AxiosRequestConfig): AxiosPromise
+  head<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  options(url: string, config?: AxiosRequestConfig): AxiosPromise
+  options<T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  post(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  put(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
 
-  patch(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise
+  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): AxiosPromise<T>
+
+  getUri(config?: AxiosRequestConfig): string
 }
 
 /**
  * @Description: 混合类型接口，这个接口本身是一个函数，但是又继承了Axios的各种方法
  * @return {*}
  */
+// export interface AxiosInstance extends Axios {
+//   (config: AxiosRequestConfig): AxiosPromise
+//   // 添加一种函数类型定义
+//   (url: string, config?: AxiosRequestConfig): AxiosPromise
+// }
 export interface AxiosInstance extends Axios {
-  (config: AxiosRequestConfig): AxiosPromise
-  // 添加一种函数类型定义
-  (url: string, config?: AxiosRequestConfig): AxiosPromise
+  <T = any>(config: AxiosRequestConfig): AxiosPromise<T>
+
+  <T = any>(url: string, config?: AxiosRequestConfig): AxiosPromise<T>
+}
+
+export interface AxiosClassStatic {
+  new (config: AxiosRequestConfig): Axios
+}
+export interface AxiosStatic extends AxiosInstance {
+  create(config?: AxiosRequestConfig): AxiosInstance
+  CancelToken: CancelTokenStatic
+  Cancel: CancelStatic
+  isCancel: (value: any) => boolean
+
+  all<T>(promises: Array<T | Promise<T>>): Promise<T[]>
+
+  spread<T, R>(callback: (...args: T[]) => R): (arr: T[]) => R
+
+  // 指向axios的类类型
+  Axios: AxiosClassStatic
+}
+
+// 拦截器接口
+export interface AxiosInterceptorManager<T> {
+  use(resolved: ResolvedFn<T>, rejected?: RejectedFn): number
+
+  eject(id: number): void
+}
+
+export interface ResolvedFn<T = any> {
+  (val: T): T | Promise<T>
+}
+
+export interface RejectedFn {
+  (error: any): any
+}
+
+export interface AxiosTransformer {
+  (data: any, headers?: any): any
+}
+
+export interface CancelToken {
+  // string类型的promise
+  promise: Promise<Cancel>
+  // Promise.resolve的参数
+  reason?: Cancel
+
+  throwIfRequested(): void
+}
+
+// 取消方法接口
+export interface Canceler {
+  (message?: string): void
+}
+
+export interface CancelExecutor {
+  (cancel: Canceler): void
+}
+
+export interface CancelTokenSource {
+  token: CancelToken
+  cancel: Canceler
+}
+
+export interface CancelTokenStatic {
+  new (executor: CancelExecutor): CancelToken
+
+  source(): CancelTokenSource
+}
+
+export interface Cancel {
+  message?: string
+}
+
+export interface CancelStatic {
+  new (message?: string): Cancel
+}
+
+export interface AxiosBasicCredentials {
+  username: string
+  password: string
 }

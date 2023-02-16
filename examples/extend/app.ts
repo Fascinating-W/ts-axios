@@ -2,40 +2,10 @@
  * @Author: Wanko
  * @Date: 2022-11-17 19:00:54
  * @LastEditors: Wanko
- * @LastEditTime: 2022-11-17 19:04:24
- * @Description: 
+ * @LastEditTime: 2022-12-15 15:49:38
+ * @Description:
  */
 import axios from '../../src/index'
-
-axios({
-  url: '/extend/post',
-  method: 'post',
-  data: {
-    msg: 'hi'
-  }
-})
-//
-axios.request({
-  url: '/extend/post',
-  method: 'post',
-  data: {
-    msg: 'hello'
-  }
-})
-
-axios.get('/extend/get')
-
-axios.options('/extend/options')
-
-axios.delete('/extend/delete')
-
-axios.head('/extend/head')
-
-axios.post('/extend/post', { msg: 'post' })
-
-axios.put('/extend/put', { msg: 'put' })
-
-axios.patch('/extend/patch', { msg: 'patch' })
 
 // axios({
 //   url: '/extend/post',
@@ -44,13 +14,45 @@ axios.patch('/extend/patch', { msg: 'patch' })
 //     msg: 'hi'
 //   }
 // })
-//
-// axios('/extend/post', {
+// //
+// axios.request({
+//   url: '/extend/post',
 //   method: 'post',
 //   data: {
 //     msg: 'hello'
 //   }
 // })
+
+// axios.get('/extend/get')
+
+// axios.options('/extend/options')
+
+// axios.delete('/extend/delete')
+
+// axios.head('/extend/head')
+
+// axios.post('/extend/post', { msg: 'post' })
+
+// axios.put('/extend/put', { msg: 'put' })
+
+// axios.patch('/extend/patch', { msg: 'patch' })
+
+// axios({
+//   url: '/extend/post',
+//   method: 'post',
+//   data: {
+//     msg: 'hi'
+//   }
+// })
+
+axios('/extend/post', {
+  method: 'post',
+  data: {
+    msg: 'hello'
+  }
+}).then(res => {
+  console.log(res)
+})
 
 // interface ResponseData<T = any> {
 //   code: number
@@ -69,11 +71,10 @@ axios.patch('/extend/patch', { msg: 'patch' })
 //     .catch(err => console.error(err))
 // }
 
-
 // async function test() {
 //   const user = await getUser<User>()
 //   if (user) {
 //     console.log(user.result.name)
 //   }
 // }
-
+// test()
